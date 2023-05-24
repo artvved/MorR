@@ -33,8 +33,8 @@ namespace Game.System
         private EcsFilter filterEnemyBullet;
 
 
-        private float riseRange = 2;
-        private float collisionRange = 0.5f;
+        private float riseRange = 2.5f;
+        private float collisionRange = 1f;
 
         public void Init(IEcsSystems systems)
         {
