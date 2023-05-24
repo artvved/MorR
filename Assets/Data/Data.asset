@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bd6399e844fb44d383e662f22b646593, type: 3}
+  m_Name: Data
+  m_EditorClassIdentifier: 
+  PlayerStats: {fileID: 11400000, guid: ed483b6b86d4dea42a172f54f60c66ce, type: 2}
+  CannonPrefab: {fileID: 5454086392563011302, guid: 919089e1617c03b4f817cbd339d339bf, type: 3}
+  CannonRotationSpeed: 30
+  BoxPrefab: {fileID: 5728204717619143314, guid: a00a5d74811e6de4892a37003dac5363, type: 3}
+  AllyMaterial: {fileID: 2100000, guid: 74b6e1ed8c3748c439216ea4cc2fb49d, type: 2}
+  EnemyMaterial: {fileID: 2100000, guid: 6ae3f7b768f555b4a9856c39f4683fe9, type: 2}
+  BulletSpeed: 3
+  BulletPrefab: {fileID: 3360976859003321288, guid: ccfb75293db55d04c83813fefbef6de5, type: 3}
