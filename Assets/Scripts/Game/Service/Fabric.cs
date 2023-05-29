@@ -23,6 +23,8 @@ namespace Game.Service
         private EcsPool<Ally> poolAlly;
         private EcsPool<Enemy> poolEnemy;
         private EcsPool<Bullet> poolBullet;
+        private EcsPool<Marble> poolMarble;
+        private EcsPool<MarbleFinish> poolMarbleFinish;
         //unit stats
         private EcsPool<Speed> poolSpeed;
         private EcsPool<Direction> poolDir;
@@ -47,6 +49,8 @@ namespace Game.Service
             poolBullet = world.GetPool<Bullet>();
             poolSpeed = world.GetPool<Speed>();
             poolDir = world.GetPool<Direction>();
+            poolMarble = world.GetPool<Marble>();
+            poolMarbleFinish = world.GetPool<MarbleFinish>();
         }
 
 
@@ -61,7 +65,15 @@ namespace Game.Service
            
             return unitEntity;
         }
-        
+
+        public int InitObj(BaseView view)
+        {
+            int entity = world.NewEntity();
+            view.Entity = entity;
+            baseViewPool.Add(entity).Value = view;
+            return entity;
+        }
+
 
         public int InstantiatePlayer()
         {
@@ -111,6 +123,33 @@ namespace Game.Service
             poolDir.Add(bullet).Value = dir;
             poolSpeed.Add(bullet).Value = staticData.BulletSpeed;
             return bullet;
+        }
+
+        private void AddSide(int entity,bool ally)
+        {
+            if (ally)
+            {
+                poolAlly.Add(entity);
+            }
+            else
+            {
+                poolEnemy.Add(entity);
+            }
+        }
+
+        public int InstantiateMarble(Vector3 pos,bool ally)
+        {
+            var entity = InstantiateObj(staticData.MarblePrefab, pos);
+            poolMarble.Add(entity).Spawn=pos;
+            AddSide(entity,ally);
+            return entity;
+        }
+        
+        public int InitMarbleFinish(BaseView view)
+        {
+            var entity = InitObj(view);
+            poolMarbleFinish.Add(entity).Type=((MarbleFinishView)view).Type;
+            return entity;
         }
 
 

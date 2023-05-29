@@ -13,7 +13,8 @@ namespace ScriptableData
         public Camera UICamera;
        
         public CoinsView CoinsView;
-        
+
+        public RandomizerView PlayerRandomizer;
 
     }
 }

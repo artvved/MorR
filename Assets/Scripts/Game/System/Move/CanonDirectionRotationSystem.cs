@@ -16,6 +16,7 @@ namespace Game.System
         
         private readonly EcsPoolInject<Direction> directionPool = default;
         private readonly EcsPoolInject<Cannon> poolCannon = default;
+        private readonly EcsCustomInject<StaticData> data = default;
 
         private EcsFilter unitTransformFilter;
 
@@ -35,7 +36,7 @@ namespace Game.System
             {
                 ref var isClockwise = ref poolCannon.Value.Get(entity).IsClockwise;
                 ref var direction = ref directionPool.Value.Get(entity).Value;
-                float angle = 60*Mathf.Deg2Rad;
+                float angle = data.Value.RotationAngle*Mathf.Deg2Rad;
                 
                 if ((direction.x>0 && direction.z<=Mathf.Sin(angle)) || (direction.x<0 && direction.z<=Mathf.Sin(angle)))
                 {

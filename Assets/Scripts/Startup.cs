@@ -38,7 +38,8 @@ public class Startup : MonoBehaviour
             .Add(new MoveApplySystem())
             .Add(new CanonDirectionRotationSystem())
             .Add(new CanonRotationSystem())
-            .Add(new RiseRangeSystem())
+            .Add(new CollisionSystem())
+            .Add(new MarbleSystem())
            
 
             .DelHerePhysics(Idents.EVENT_WORLD)
@@ -73,6 +74,7 @@ public class Startup : MonoBehaviour
             .DelHere<RiseEvent>(Idents.EVENT_WORLD)
             .DelHere<FallEvent>(Idents.EVENT_WORLD)
             .DelHere<HitEvent>(Idents.EVENT_WORLD)
+            .DelHere<EndGameEvent>(Idents.EVENT_WORLD)
 #if UNITY_EDITOR
             .Add (new Leopotam.EcsLite.UnityEditor.EcsWorldDebugSystem ())
             .Add (new Leopotam.EcsLite.UnityEditor.EcsWorldDebugSystem (Idents.EVENT_WORLD))

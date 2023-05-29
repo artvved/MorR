@@ -20,3 +20,10 @@ MonoBehaviour:
   EnemyMaterial: {fileID: 2100000, guid: 6ae3f7b768f555b4a9856c39f4683fe9, type: 2}
   BulletSpeed: 3
   BulletPrefab: {fileID: 3360976859003321288, guid: ccfb75293db55d04c83813fefbef6de5, type: 3}
+  MarblePrefab: {fileID: 6950932747283819410, guid: 854c407b349e05242b44204fff11f0ce, type: 3}
+  MarbleBounce: 10
+  RiseRange: 2.5
+  BulletSize: 1
+  BoxSize: 1
+  CannonSize: 2
+  RotationAngle: 50

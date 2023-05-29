@@ -1,61 +1,113 @@
 using DefaultNamespace;
 using Game.Component;
-using Game.Mono;
-using Game.Service;
 using Leopotam.EcsLite;
 using Leopotam.EcsLite.Di;
-using Mitfart.LeoECSLite.UnityIntegration;
 using ScriptableData;
 using UnityEngine;
 
 
 namespace Game.System
 {
-    public class RiseRangeSystem : IEcsInitSystem, IEcsRunSystem
+    public class CollisionSystem : IEcsInitSystem, IEcsRunSystem
     {
         private EcsWorld world;
         private EcsWorld eventWorld;
-        
+
         private readonly EcsPoolInject<BaseViewComponent> poolView = default;
-        
+
         private readonly EcsPoolInject<Rising> poolRising = default;
         private readonly EcsPoolInject<RiseEvent> poolRisingEvent = Idents.EVENT_WORLD;
         private readonly EcsPoolInject<FallEvent> poolFallEvent = Idents.EVENT_WORLD;
         private readonly EcsPoolInject<HitEvent> poolHitEvent = Idents.EVENT_WORLD;
+        private readonly EcsPoolInject<EndGameEvent> poolEndEvent = Idents.EVENT_WORLD;
+
         private readonly EcsPoolInject<DeadTag> poolDead = default;
+
+        private readonly EcsCustomInject<StaticData> data = default;
 
         private EcsFilter filterNotRisingEnemyBox;
         private EcsFilter filterRisingEnemyBox;
         private EcsFilter filterAllyBullet;
-        
+
         private EcsFilter filterNotRisingAllyBox;
         private EcsFilter filterRisingAllyBox;
         private EcsFilter filterEnemyBullet;
 
+        private EcsFilter filterAllyCannon;
+        private EcsFilter filterEnemyCannon;
 
-        private float riseRange = 2.5f;
-        private float collisionRange = 1f;
+
+        private float riseRange;
+        private float collisionBoxRange;
+        private float collisionCannonRange;
 
         public void Init(IEcsSystems systems)
         {
+            riseRange = data.Value.RiseRange;
+            collisionBoxRange = (data.Value.BoxSize + data.Value.BulletSize) / 2;
+            collisionCannonRange = (data.Value.CannonSize + data.Value.BulletSize) / 2;
+
             world = systems.GetWorld();
             eventWorld = systems.GetWorld(Idents.EVENT_WORLD);
 
             filterNotRisingEnemyBox = world.Filter<Box>().Inc<Enemy>().Exc<Rising>().End();
             filterRisingEnemyBox = world.Filter<Box>().Inc<Enemy>().Inc<Rising>().End();
             filterAllyBullet = world.Filter<Bullet>().Inc<Ally>().End();
-            
+
             filterNotRisingAllyBox = world.Filter<Box>().Inc<Ally>().Exc<Rising>().End();
             filterRisingAllyBox = world.Filter<Box>().Inc<Ally>().Inc<Rising>().End();
             filterEnemyBullet = world.Filter<Bullet>().Inc<Enemy>().End();
+
+            filterAllyCannon = world.Filter<Cannon>().Inc<Ally>().End();
+            filterEnemyCannon = world.Filter<Cannon>().Inc<Enemy>().End();
         }
 
         public void Run(IEcsSystems systems)
         {
-            Handle();
+            //enemy boxes - player bullets
+            RiseBoxesInRange(filterNotRisingEnemyBox, filterAllyBullet);
+            BoxBulletCollision(filterRisingEnemyBox, filterAllyBullet);
+            CheckForBulletsInRange(filterRisingEnemyBox, filterAllyBullet);
+
+            //enemy bullets - player boxes
+            RiseBoxesInRange(filterNotRisingAllyBox, filterEnemyBullet);
+            BoxBulletCollision(filterRisingAllyBox, filterEnemyBullet);
+            CheckForBulletsInRange(filterRisingAllyBox, filterEnemyBullet);
+
+            CheckCannonHit(true);
+            CheckCannonHit(false);
         }
 
-        private void RiseBoxesInRange(EcsFilter filterNotRisingBox,EcsFilter filterBullet)
+        private void CheckCannonHit(bool ally)
+        {
+            EcsFilter filterCannon, filterBullet;
+            if (ally)
+            {
+                filterCannon = filterAllyCannon;
+                filterBullet = filterEnemyBullet;
+            }
+            else
+            {
+                filterCannon = filterEnemyCannon;
+                filterBullet = filterAllyBullet;
+            }
+
+            foreach (var cannon in filterCannon)
+            {
+                var cannonPos = poolView.Value.Get(cannon).Value.transform.position;
+                foreach (var bullet in filterBullet)
+                {
+                    var bulletPos = poolView.Value.Get(bullet).Value.transform.position;
+                    if (IsInRange(bulletPos, cannonPos, collisionCannonRange))
+                    {
+                        poolEndEvent.NewEntity(out int e).IsWin = !ally;
+                        Debug.Log("Fin");
+                    }
+                }
+            }
+        }
+
+        private void RiseBoxesInRange(EcsFilter filterNotRisingBox, EcsFilter filterBullet)
         {
             foreach (var box in filterNotRisingBox)
             {
@@ -73,7 +125,7 @@ namespace Game.System
             }
         }
 
-        private void BoxBulletCollision(EcsFilter filterRisingBox,EcsFilter filterBullet)
+        private void BoxBulletCollision(EcsFilter filterRisingBox, EcsFilter filterBullet)
         {
             //del rise on collision
             foreach (var box in filterRisingBox)
@@ -84,7 +136,7 @@ namespace Game.System
                 {
                     var bulletPos = poolView.Value.Get(bullet).Value.transform.position;
                     //collision check
-                    if (IsInRange(bulletPos, boxPos, collisionRange))
+                    if (IsInRange(bulletPos, boxPos, collisionBoxRange) && !poolDead.Value.Has(bullet))
                     {
                         poolRising.Value.Del(box);
                         poolFallEvent.NewEntity(out int e).Target = box;
@@ -96,7 +148,7 @@ namespace Game.System
             }
         }
 
-        private void CheckForBulletsInRange(EcsFilter filterRisingBox,EcsFilter filterBullet)
+        private void CheckForBulletsInRange(EcsFilter filterRisingBox, EcsFilter filterBullet)
         {
             //del rise on no bullets in range
             foreach (var box in filterRisingBox)
@@ -120,19 +172,6 @@ namespace Game.System
                     poolFallEvent.NewEntity(out int e).Target = box;
                 }
             }
-        }
-
-        private void Handle()
-        {
-            //enemy boxes - player bullets
-            RiseBoxesInRange(filterNotRisingEnemyBox,filterAllyBullet);
-            BoxBulletCollision(filterRisingEnemyBox,filterAllyBullet);
-            CheckForBulletsInRange(filterRisingEnemyBox,filterAllyBullet);
-            
-            //enemy bullets - player boxes
-            RiseBoxesInRange(filterNotRisingAllyBox,filterEnemyBullet);
-            BoxBulletCollision(filterRisingAllyBox,filterEnemyBullet);
-            CheckForBulletsInRange(filterRisingAllyBox,filterEnemyBullet);
         }
 
 
