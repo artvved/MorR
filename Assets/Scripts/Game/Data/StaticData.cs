@@ -18,6 +18,7 @@ namespace ScriptableData
         public float CannonRotationSpeed;
         public float BulletSpeed;
         public float MarbleBounce;
+        public float AddMarbleTime;
 
         public float RiseRange ;
         public float BulletSize ;

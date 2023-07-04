@@ -61,13 +61,14 @@ public class Startup : MonoBehaviour
         systems
             .AddWorld(eventWorld,Idents.EVENT_WORLD)
             .Add(new InitWorldSystem())
-         
+            
             .Add(new ShotButtonSystem())
             .Add(new X2System())
             .Add(new ShotSystem())
             .Add(new ToggleInputSystem())
             .Add(new HitSystem())
             .Add(new RiseFallViewSystem())
+            .Add(new AddMarbleTickSystem())
             .Add(new DestroyDeadSystem())
 
             //.Add(new TickSystem())
