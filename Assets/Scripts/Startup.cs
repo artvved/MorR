@@ -19,7 +19,7 @@ public class Startup : MonoBehaviour
     private EcsWorld world;
     private EcsSystems systems;
     private EcsSystems phisSystems;
-    
+    public static PlayerData PlayerData;
 
     [SerializeField]
     private SceneData sceneData;
@@ -32,6 +32,8 @@ public class Startup : MonoBehaviour
         systems = new EcsSystems(world);
         phisSystems = new EcsSystems(world);
         EcsPhysicsEvents.ecsWorld = eventWorld;
+
+        LoadData();
         
         phisSystems.AddWorld(eventWorld,Idents.EVENT_WORLD)
             
@@ -61,16 +63,20 @@ public class Startup : MonoBehaviour
             .Add(new InitWorldSystem())
          
             .Add(new ShotButtonSystem())
+            .Add(new X2System())
             .Add(new ShotSystem())
+            .Add(new ToggleInputSystem())
             .Add(new HitSystem())
             .Add(new RiseFallViewSystem())
             .Add(new DestroyDeadSystem())
 
             //.Add(new TickSystem())
-            .Add(new UpdateCoinsSystem())
+            .Add(new UpdateBulletUISystem())
 
             .DelHere<CoinsChangedEventComponent>(Idents.EVENT_WORLD)
-            .DelHere<ShotEvent>(Idents.EVENT_WORLD)
+            .DelHere<ReleaseEvent>(Idents.EVENT_WORLD)
+            .DelHere<X2Event>(Idents.EVENT_WORLD)
+            .DelHere<ToggleInputEvent>(Idents.EVENT_WORLD)
             .DelHere<RiseEvent>(Idents.EVENT_WORLD)
             .DelHere<FallEvent>(Idents.EVENT_WORLD)
             .DelHere<HitEvent>(Idents.EVENT_WORLD)
@@ -88,7 +94,19 @@ public class Startup : MonoBehaviour
             .Init();
     }
 
-  
+    private void LoadData()
+    {
+        PlayerData = new PlayerData();
+        PlayerData.Level = PlayerPrefs.GetInt("Level");
+    }
+    
+    public static void SaveData()
+    {
+        PlayerPrefs.SetInt("Level", PlayerData.Level);
+      
+    }
+
+
     void Update()
     {
         systems?.Run();
@@ -101,6 +119,7 @@ public class Startup : MonoBehaviour
 
     private void OnDestroy()
     {
+        SaveData();
         if (systems!=null)
         {
             systems.Destroy();

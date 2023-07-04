@@ -6,14 +6,11 @@ namespace Game.Mono
 {
     public class BoxView : BaseView
     {
-        private MeshRenderer meshRenderer;
+        [SerializeField] private GameObject playerVisual;
+        [SerializeField] private GameObject enemyVisual;
+        
 
-        private void Start()
-        {
-            meshRenderer=GetComponentInChildren<MeshRenderer>();
-        }
-
-        private float animTime = 0.3f;
+        [SerializeField] private float animTime = 0.3f;
 
         public void Rise()
         {
@@ -25,9 +22,10 @@ namespace Game.Mono
             transform.DOMoveY(0, animTime);
         }
 
-        public void SetMaterial(Material material)
-        {
-            meshRenderer.material = material;
+        public void SetSide(bool isPlayer)
+        { 
+           playerVisual.SetActive(isPlayer);
+           enemyVisual.SetActive(!isPlayer);
         }
     }
 }

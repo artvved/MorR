@@ -12,18 +12,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bd6399e844fb44d383e662f22b646593, type: 3}
   m_Name: Data
   m_EditorClassIdentifier: 
-  PlayerStats: {fileID: 11400000, guid: ed483b6b86d4dea42a172f54f60c66ce, type: 2}
-  CannonPrefab: {fileID: 5454086392563011302, guid: 919089e1617c03b4f817cbd339d339bf, type: 3}
-  CannonRotationSpeed: 30
-  BoxPrefab: {fileID: 5728204717619143314, guid: a00a5d74811e6de4892a37003dac5363, type: 3}
   AllyMaterial: {fileID: 2100000, guid: 74b6e1ed8c3748c439216ea4cc2fb49d, type: 2}
   EnemyMaterial: {fileID: 2100000, guid: 6ae3f7b768f555b4a9856c39f4683fe9, type: 2}
+  LevelPath: Levels/Level {0}
+  MaxLevel: 1
+  CannonRotationSpeed: 30
   BulletSpeed: 3
-  BulletPrefab: {fileID: 3360976859003321288, guid: ccfb75293db55d04c83813fefbef6de5, type: 3}
-  MarblePrefab: {fileID: 6950932747283819410, guid: 854c407b349e05242b44204fff11f0ce, type: 3}
   MarbleBounce: 10
   RiseRange: 2.5
   BulletSize: 1
   BoxSize: 1
   CannonSize: 2
   RotationAngle: 50
+  ShotTimeDelta: 0.1
+  CannonPrefab: {fileID: 5454086392563011302, guid: 919089e1617c03b4f817cbd339d339bf, type: 3}
+  BoxPrefab: {fileID: 5728204717619143314, guid: a00a5d74811e6de4892a37003dac5363, type: 3}
+  BulletPrefab: {fileID: 3360976859003321288, guid: ccfb75293db55d04c83813fefbef6de5, type: 3}
+  MarblePrefab: {fileID: 6950932747283819410, guid: 854c407b349e05242b44204fff11f0ce, type: 3}

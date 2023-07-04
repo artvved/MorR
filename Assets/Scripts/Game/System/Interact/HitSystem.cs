@@ -43,21 +43,21 @@ namespace Game.System
                 var target = poolHitEvent.Value.Get(entity).Target;
                 var boxView = (BoxView)poolView.Value.Get(target).Value;
 
-                Material material;
+                bool isPlayer;
                 if (poolAlly.Value.Has(target))
                 {
-                    material = staticData.Value.EnemyMaterial;
+                    isPlayer = false;
                     poolAlly.Value.Del(target);
                     poolEnemy.Value.Add(target);
                 }
                 else
                 {
-                    material = staticData.Value.AllyMaterial;
+                    isPlayer = true;
                     poolAlly.Value.Add(target);
                     poolEnemy.Value.Del(target);
                 }
                 
-                boxView.SetMaterial(material);
+                boxView.SetSide(isPlayer);
                
             }
             

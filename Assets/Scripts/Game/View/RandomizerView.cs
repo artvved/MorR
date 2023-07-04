@@ -7,5 +7,14 @@ namespace Game.Mono
     {
         public Transform MarbleSpawn;
         public MarbleFinishView[] Finishes;
+
+        public void ToggleInput(bool block)
+        {
+            foreach (var finish in Finishes)
+            {
+                //change color
+                finish.Toggle(!block);
+            }
+        }
     }
 }

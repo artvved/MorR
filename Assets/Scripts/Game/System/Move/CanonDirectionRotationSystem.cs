@@ -37,7 +37,7 @@ namespace Game.System
                 ref var isClockwise = ref poolCannon.Value.Get(entity).IsClockwise;
                 ref var direction = ref directionPool.Value.Get(entity).Value;
                 float angle = data.Value.RotationAngle*Mathf.Deg2Rad;
-                
+
                 if ((direction.x>0 && direction.z<=Mathf.Sin(angle)) || (direction.x<0 && direction.z<=Mathf.Sin(angle)))
                 {
                     isClockwise = !isClockwise;

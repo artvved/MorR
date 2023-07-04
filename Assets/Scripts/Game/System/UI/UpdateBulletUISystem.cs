@@ -1,20 +1,18 @@
 using DefaultNamespace;
 using Game.Component;
-
 using Leopotam.EcsLite;
 using Leopotam.EcsLite.Di;
 using ScriptableData;
 
 
-
 namespace Game.System
 {
-    public class UpdateCoinsSystem : IEcsInitSystem, IEcsRunSystem
+    public class UpdateBulletUISystem : IEcsInitSystem, IEcsRunSystem
     {
         private EcsWorld world;
         private EcsWorld eventWorld;
         private readonly EcsCustomInject<SceneData> sceneData = default;
-        private readonly EcsPoolInject<UnitStatsComponent> unitPool = default;
+        private readonly EcsPoolInject<Cannon> poolCannon = default;
 
 
         private EcsFilter eventFilter;
@@ -24,20 +22,15 @@ namespace Game.System
         {
             world = systems.GetWorld();
             eventWorld = systems.GetWorld(Idents.EVENT_WORLD);
-            eventFilter = eventWorld.Filter<CoinsChangedEventComponent>().End();
-            playerFilter = world.Filter<Cannon>().End();
+            playerFilter = world.Filter<Cannon>().Inc<Ally>().End();
         }
 
         public void Run(IEcsSystems systems)
         {
-            foreach (var entity in eventFilter)
+            foreach (var player in playerFilter)
             {
-                foreach (var player in playerFilter)
-                {
-                    ref var coins = ref unitPool.Value.Get(player).Coins;
-                    coins++;
-                    sceneData.Value.CoinsView.TextMeshProUGUI.text = coins.ToString();
-                }
+                var bulletCount = poolCannon.Value.Get(player).BulletCount;
+                sceneData.Value.counterView.SetText(bulletCount);
             }
         }
     }

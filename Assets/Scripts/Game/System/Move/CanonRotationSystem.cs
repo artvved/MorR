@@ -45,9 +45,8 @@ namespace Game.System
                 }
 
                 view.Body.rotation=Quaternion.Euler(view.Body.rotation.eulerAngles+new Vector3(0, rotationSpeed*Time.deltaTime,0));
-                direction = view.Body.forward;
+                direction = view.transform.worldToLocalMatrix.MultiplyVector(view.Body.forward);
 
-               
             }
         }
     }

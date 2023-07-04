@@ -30,6 +30,7 @@ namespace Game.Service
         private EcsPool<Direction> poolDir;
         //view
         private EcsPool<BaseViewComponent> baseViewPool;
+        private EcsPool<RandomizerComponent> poolRandomizer;
 
 
         public Fabric(EcsWorld world, StaticData staticData, SceneData sceneData)
@@ -51,6 +52,7 @@ namespace Game.Service
             poolDir = world.GetPool<Direction>();
             poolMarble = world.GetPool<Marble>();
             poolMarbleFinish = world.GetPool<MarbleFinish>();
+            poolRandomizer = world.GetPool<RandomizerComponent>();
         }
 
 
@@ -74,51 +76,70 @@ namespace Game.Service
             return entity;
         }
 
+        
 
-        public int InstantiatePlayer()
+        public void InstantiateLevel(LevelView levelView)
         {
-            var playerEntity = InstantiateObj(staticData.CannonPrefab, Vector3.zero+new Vector3(12,0,12f));
-            poolCanon.Add(playerEntity).IsClockwise=true;
-            poolDir.Add(playerEntity).Value = new Vector3(0, 0, 1);
-            return playerEntity;
-        }
+            var level = GameObject.Instantiate(levelView);
 
-        public void InstantiateField()
-        {
-            var x = 24;
-            var z = 24;
-            for (int i = 0; i < x; i++)
+            var playerField = level.PlayerField;
+            var boxViewsPl = playerField.GetComponentsInChildren<BoxView>();
+            foreach (var box in boxViewsPl)
             {
-                for (int j = 0; j < z; j++)
-                {
-                    var box=InstantiateBox(new Vector3(i,0,j));
-                    poolAlly.Add(box);
-                    baseViewPool.Get(box).Value.GetComponentInChildren<MeshRenderer>().material = staticData.AllyMaterial;
-                }
+                var boxE = InitObj(box);
+                AddSide(boxE,true);
+                poolBox.Add(boxE);
+                box.SetSide(true);
             }
             
-            for (int i = 0; i < x; i++)
+            var enemyField = level.EnemyField;
+            var boxViewsE = enemyField.GetComponentsInChildren<BoxView>();
+            foreach (var box in boxViewsE)
             {
-                for (int j = z; j < z*2; j++)
-                {
-                    var box=InstantiateBox(new Vector3(i,0,j));
-                    poolEnemy.Add(box);
-                    baseViewPool.Get(box).Value.GetComponentInChildren<MeshRenderer>().material = staticData.EnemyMaterial;
-                }
+                var boxE = InitObj(box);
+                AddSide(boxE,false);
+                poolBox.Add(boxE);
+                box.SetSide(false);
             }
+
+            var playerCannon = InitObj(level.PlayerCannon);
+            AddSide(playerCannon,true);
+            ref var playerCannonComp = ref poolCanon.Add(playerCannon);
+            playerCannonComp.IsClockwise=true;
+            playerCannonComp.BulletCount = 1;
+            poolDir.Add(playerCannon).Value = new Vector3(0, 0, 1);
+            poolRandomizer.Add(playerCannon).Value=level.PlayerRandomizer;
+            
+            var enemyCannon = InitObj(level.EnemyCannon);
+            AddSide(enemyCannon,false);
+            ref var enemyCannonComp = ref poolCanon.Add(enemyCannon);
+            enemyCannonComp.IsClockwise=true;
+            enemyCannonComp.BulletCount = 1;
+            poolDir.Add(enemyCannon).Value = new Vector3(0, 0, -1);
+            poolRandomizer.Add(enemyCannon).Value=level.EnemyRandomizer;
+            
+
+            var playerRandomizer = level.PlayerRandomizer;
+            InstantiateMarble(playerRandomizer.MarbleSpawn.position,true);
+            foreach (var finish in playerRandomizer.Finishes)
+            {
+                InitMarbleFinish(finish);
+            }
+            
+            var eRandomizer = level.EnemyRandomizer;
+            InstantiateMarble(eRandomizer.MarbleSpawn.position,false);
+            foreach (var finish in eRandomizer.Finishes)
+            {
+                InitMarbleFinish(finish);
+            }
+
+            
         }
 
-        private int InstantiateBox(Vector3 pos)
-        {
-           var box= InstantiateObj(staticData.BoxPrefab,pos);
-           poolBox.Add(box);
-           return box;
-        }
-
-        public int InstantiatePlayerBullet(Vector3 pos,Vector3 dir)
+        public int InstantiateBullet(Vector3 pos,Vector3 dir,bool isAlly)
         {
             var bullet= InstantiateObj(staticData.BulletPrefab,pos);
-            poolAlly.Add(bullet);
+            AddSide(bullet,isAlly);
             poolBullet.Add(bullet);
             poolDir.Add(bullet).Value = dir;
             poolSpeed.Add(bullet).Value = staticData.BulletSpeed;
@@ -128,13 +149,10 @@ namespace Game.Service
         private void AddSide(int entity,bool ally)
         {
             if (ally)
-            {
                 poolAlly.Add(entity);
-            }
             else
-            {
                 poolEnemy.Add(entity);
-            }
+            
         }
 
         public int InstantiateMarble(Vector3 pos,bool ally)

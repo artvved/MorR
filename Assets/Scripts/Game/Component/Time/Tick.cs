@@ -1,6 +1,6 @@
 ﻿namespace Game.Component.Time
 {
-    public struct TickComponent
+    public struct Tick
     {
         public float FinalTime;
         public float CurrentTime;

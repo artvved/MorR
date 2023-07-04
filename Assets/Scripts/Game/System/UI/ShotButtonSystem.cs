@@ -16,7 +16,7 @@ namespace Game.System
         private EcsWorld world;
         private EcsWorld eventWorld;
 
-        private readonly EcsPoolInject<ShotEvent> poolShotEvent = Idents.EVENT_WORLD;
+        private readonly EcsPoolInject<ReleaseEvent> poolShotEvent = Idents.EVENT_WORLD;
         
         private EcsFilter playerFilter;
 

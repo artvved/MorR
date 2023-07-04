@@ -11,18 +11,19 @@ namespace Game.System
     public class InitWorldSystem : IEcsInitSystem
     {
         private readonly EcsCustomInject<Fabric> fabric=default;
-        private readonly EcsCustomInject<SceneData> sceneData = default;
+        private readonly EcsCustomInject<StaticData> staticData = default;
         private EcsPool<BaseViewComponent> playerTransformPool;
         
 
         public void Init(IEcsSystems systems)
         {
             playerTransformPool = systems.GetWorld().GetPool<BaseViewComponent>();
+
+            var level = Mathf.Clamp(Startup.PlayerData.Level, 0, staticData.Value.MaxLevel - 1);
+            var levelGo = Resources.Load<LevelView>(string.Format(staticData.Value.LevelPath, level + 1));
+
+            fabric.Value.InstantiateLevel(levelGo);
             
-            var plEntity=fabric.Value.InstantiatePlayer();
-            var playerView = (CannonView)playerTransformPool.Get(plEntity).Value;
-           
-            fabric.Value.InstantiateField();
             
         }
 

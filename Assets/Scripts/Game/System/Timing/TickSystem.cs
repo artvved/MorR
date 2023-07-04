@@ -10,7 +10,7 @@ namespace Game.System.Timing
     {
         private EcsWorld world;
         
-        private readonly EcsPoolInject<TickComponent> tickPool = default;
+        private readonly EcsPoolInject<Tick> tickPool = default;
        
         private EcsFilter tickFilter;
 
@@ -19,7 +19,7 @@ namespace Game.System.Timing
         {
             world = systems.GetWorld();
 
-            tickFilter = world.Filter<TickComponent>().End();
+            tickFilter = world.Filter<Tick>().End();
         }
 
         public void Run(IEcsSystems systems)
